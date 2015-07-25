@@ -1,0 +1,15 @@
+<div class="store-menu-container">
+<ul class="no-bullet store-menu">
+    <li><div id="menu-first-icon" class="menu-icon"><i class="icon-credit-card"></i></div><span id="menu-first-text">Acquired</span></li>
+    <li><div id="menu-second-icon" class="menu-icon"><i class="icon-cloud-upload"></i></div><span id="menu-second-text">Provided</span></li>
+</ul>
+<ul class="no-bullet store-sub-menu">
+    <li><i class="icon-home"></i><a href="/store">Home</a></li>
+    {% if not oil %}
+    <li><i class="icon-wrench"></i><a href="/store/organization">Management</a></li>
+    {% endif %}
+</ul>
+</div>
+<div class="close-btn">
+    <i class="icon-caret-left"></i>
+</div>

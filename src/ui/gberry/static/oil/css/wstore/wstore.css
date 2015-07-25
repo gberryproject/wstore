@@ -1,0 +1,14 @@
+.return-button {
+  left: 12px;
+}
+
+#provider-options {
+  position: absolute;
+  top: 51px;
+  left: auto;
+  right: 505px;
+}
+
+.logo-header .brand {
+  height: 21px;
+}

@@ -1,0 +1,67 @@
+<table class="table table-striped" id="element-table">
+    <thead>
+        <tr>
+            <th>Elements</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td class="show-markets"> Marketplaces </td>
+            <td>
+                <div class="add-market">
+                    <i class="icon-plus"></i>
+                </div>
+            </td>
+       </tr>
+       <tr>
+           <td class="show-rep"> Repositories </td>
+           <td>
+               <div class="add-rep">
+                   <i class="icon-plus add-rep"></i>
+               </div>
+           </td>
+       </tr>
+       <tr>
+           <td class="show-rss"> RSS </td>
+           <td>
+               <div class="add-rss">
+                   <i class="icon-plus add-rss"></i>
+               </div>
+           </td>
+       </tr>
+       {% if not oil %}
+        <tr>
+           <td class="show-org"> Organizations </td>
+           <td>
+               <div class="add-org">
+                   <i class="icon-plus add-org"></i>
+               </div>
+           </td>
+       </tr>
+        <tr>
+           <td class="show-prof"> User profiles </td>
+           <td>
+               <div class="add-prof">
+                   <i class="icon-plus add-prof"></i>
+               </div>
+           </td>
+       </tr>
+       {% endif %}
+       <tr>
+           <td class="show-units"> Pricing model units </td>
+           <td>
+               <div class="add-unit">
+                   <i class="icon-plus add-unit"></i>
+               </div>
+           </td>
+       </tr>
+       <tr>
+           <td class="show-currencies"> Allowed currencies </td>
+           <td>
+               <div class="add-currency">
+                   <i class="icon-plus add-currency"></i>
+               </div>
+           </td>
+       </tr>
+    </tbody>
+</table>

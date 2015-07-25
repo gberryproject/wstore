@@ -1,0 +1,138 @@
+
+<div class="row row-fluid">
+<form class="form form-vertical admin-form double-column">
+    <div id="admin-err-cont" />
+    <h2>User</h2>
+    <fieldset>
+    <section class="span6">
+        <div class="control-group">
+            <label for="id_full_name" class="control-label">Full name</label>
+            <div class="controls span5" style="margin-left: 0px;">
+                <input type="text" id="id_first_name" class="span12" placeholder="First name" />
+            </div><!-- /.controls -->
+            <div class="controls span5">
+                <input type="text" id="id_last_name" class="span12" placeholder="Last name" />
+            </div><!-- /.controls -->
+        </div><!-- /.control-group -->
+        <div class="control-group">
+            <label for="id_user_name" class="control-label">Username</label>
+            <div class="controls">
+                <input type="text" id="id_user_name" class="span10" placeholder="Enter at least 5 characters" />
+            </div><!-- /.controls -->
+        </div><!-- /.control-group -->
+        <div class="control-group" style="margin-bottom: 13px;">
+            <label for="id_roles" class="control-label">Roles <small style="color: #999;">(optional)</small></label>
+            <div class="controls">
+                <label class="checkbox inline"><input type="checkbox" id="id_rol_provider" /> Provider</label>
+                <label class="checkbox inline"><input type="checkbox" id="id_rol_admin" /> Admin</label>
+            </div><!-- /.controls -->
+        </div><!-- /.control-group -->
+    </section>
+    <section class="span6">
+        <div class="control-group">
+            <label for="id_password1" class="control-label">Password</label>
+            <div class="controls">
+                <input type="password" id="id_password1" class="span10" placeholder="Enter at least 5 characters" />
+            </div><!-- /.controls -->
+        </div><!-- /.control-group -->
+        <div class="control-group">
+            <label for="id_password2" class="control-label">Password confirmation</label>
+            <div class="controls">
+                <input type="password" id="id_password2" class="span10" placeholder="Enter the same password as above" />
+            </div><!-- /.controls -->
+        </div><!-- /.control-group -->
+        <div class="control-group hide">
+            <label for="id_notification_url" class="control-label">Notification URL <small style="color: #999;">(optional)</small></label>
+            <div class="controls">
+                <input type="text" id="id_notification_url" class="span10" placeholder="Notification URL" />
+            </div><!-- /.controls -->
+        </div><!-- /.control-group -->
+    </section>
+    <div class="space clear"></div>
+    <div class="line clear"></div>
+    <section class="span6" style="margin-left: 0px;">
+        <h3>Payment Form <small>(optional)</small></h3>
+        <div class="control-group">
+            <label for="id_card_type" class="control-label" >Card type</label>
+            <div class="controls">
+                <select id="id_card_type" class="span10">
+                    <option value="0" selected>Choose the card type</option>
+                    <option value="Visa">Visa</option>
+                    <option value="MasterCard">MasterCard</option>
+                </select>
+            </div><!-- /.controls -->
+        </div><!-- /.control-group -->
+        <div class="control-group">
+            <label for="id_card_number" class="control-label">Card number</label>
+            <div class="controls">
+                <input type="text" id="id_card_number" class="span10" placeholder="Card number" />
+            </div><!-- /.controls -->
+        </div><!-- /.control-group -->
+        <div class="control-group">
+            <label for="id_card_code" class="control-label">Card code</label>
+            <div class="controls">
+                <input type="text" id="id_card_code" class="span10" placeholder="CVV2 / CVC2" />
+            </div><!-- /.controls -->
+        </div><!-- /.control-group -->
+        <div class="control-group">
+            <label for="id_expiry_date" class="control-label">Expiry date</label>
+            <div class="controls span5" style="margin-left: 0px;">
+                <select id="id_card_month" class="span12">
+                    <option value="0" selected>Month</option>
+                    <option value="1">January</option>
+                    <option value="2">February</option>
+                    <option value="3">March</option>
+                    <option value="4">April</option>
+                    <option value="5">May</option>
+                    <option value="6">June</option>
+                    <option value="7">July</option>
+                    <option value="8">August</option>
+                    <option value="9">September</option>
+                    <option value="10">October</option>
+                    <option value="11">November</option>
+                    <option value="12">December</option>
+                </select>
+            </div><!-- /.controls -->
+            <div class="controls span5">
+                <input type="text" id="id_card_year" class="span12" placeholder="Year" />
+            </div><!-- /.controls -->
+        </div><!-- /.control-group -->
+    </section>
+    <section class="span6">
+        <h3>Tax Address <small>(optional)</small></h3>
+        <div class="control-group">
+            <label for="id_tax_street" class="control-label">Street</label>
+            <div class="controls">
+                <input type="text" id="id_tax_street" class="span10" placeholder="Street" />
+            </div><!-- /.controls -->
+        </div><!-- /.control-group -->
+        <div class="control-group">
+            <label for="id_tax_postcode" class="control-label">Postcode</label>
+            <div class="controls">
+                <input type="text" id="id_tax_postcode" class="span10" placeholder="Postcode" />
+            </div><!-- /.controls -->
+        </div><!-- /.control-group -->
+        <div class="control-group">
+            <label for="id_tax_city" class="control-label">City</label>
+            <div class="controls">
+                <input type="text" id="id_tax_city" class="span10" placeholder="City" />
+            </div><!-- /.controls -->
+        </div><!-- /.control-group -->
+        <div class="control-group">
+            <label for="id_tax_country" class="control-label">Country</label>
+            <div class="controls">
+                <input type="text" id="id_tax_country" class="span10" placeholder="Country" />
+            </div><!-- /.controls -->
+        </div><!-- /.control-group -->
+    </section>
+    <div class="space clear"></div>
+    <div class="line clear"></div>
+    <div class="space clear"></div>
+    <div class="control-group">
+        <div class="controls" style="text-align: center;">
+            <input type="button" class="btn btn-blue" id="elem-submit" value="Register" />
+        </div><!-- /.controls -->
+    </div><!-- /.control-group -->
+  </fieldset>
+</form>
+</div>

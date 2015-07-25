@@ -1,0 +1,82 @@
+{% load i18n %}{% load url from future %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>GBerry Store</title>
+    <link rel="shortcut icon" href="{{ STATIC_URL }}assets/ico/favicon.ico" />
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Comfortaa|Open+Sans">
+    <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}assets/css/aplication.css" />
+    <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}assets/css/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}assets/css/bootstrap-responsive.css" />
+    <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}assets/css/docs.css" />
+    <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}assets/css/store/core.css" />
+    <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}assets/fonts/fonts.css" />
+    <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}oil/css/cookies_policy.css" />
+    
+    {% block extra_textCSS %}{% endblock %}
+
+    <script type="text/javascript">
+        USERNAME = "{{ user.username }}";
+        ORGANIZATION = "{{ organization }}";
+        INITIAL_PAGE = "organization";
+    </script>
+    <script type="text/x-jquery-tmpl" id="user_conf_template">{% include "user_conf_template.html" %}</script>
+    <script type="text/x-jquery-tmpl" id="user_info_conf_template">{% include "user_info_conf_template.html" %}</script>
+    <script type="text/x-jquery-tmpl" id="org_info_conf_template">{% include "org_info_conf_template.html" %}</script>
+    <script type="text/x-jquery-tmpl" id="address_conf_template">{% include "address_conf_template.html" %}</script>
+    <script type="text/x-jquery-tmpl" id="payment_info_conf_template">{% include "payment_info_conf_template.html" %}</script>
+    <script type="text/x-jquery-tmpl" id="expenditure_conf_template">{% include "expenditure_conf_template.html" %}</script>
+    <script type="text/x-jquery-tmpl" id="user_info_form_template">{% include "user_info_form_template.html" %}</script>
+    <script type="text/x-jquery-tmpl" id="org_info_form_template">{% include "org_info_form_template.html" %}</script>
+    <script type="text/x-jquery-tmpl" id="address_conf_form_template">{% include "address_conf_form_template.html" %}</script>
+    <script type="text/x-jquery-tmpl" id="payment_info_form_template">{% include "payment_info_form_template.html" %}</script>
+    <script type="text/x-jquery-tmpl" id="expenditure_conf_form_template">{% include "expenditure_conf_form_template.html" %}</script>
+    
+    <script type="text/x-jquery-tmpl" id="modal_template">{% include "modal_template.html" %}</script>
+    <script type="text/x-jquery-tmpl" id="alert_error_template">{% include "alert_error_template.html" %}</script>
+    <script type="text/x-jquery-tmpl" id="alert_info_template">{% include "alert_info_template.html" %}</script>
+    <script type="text/x-jquery-tmpl" id="orgs_users_template">{% include "admin/orgs_users_template.html" %}</script>
+    <script type="text/x-jquery-tmpl" id="menu-template">{% include "organizations/org_menu_template.html" %}</script>
+
+    {% if oil and portal %}
+      <script type="text/javascript" src="{{ account }}assets/signOut.js"></script>
+    {% endif %}
+
+    <link rel="stylesheet" href="{{ STATIC_URL }}oil/css/wstore/wstore.css">
+    <script type="text/javascript" src="{{ STATIC_URL }}jquery/jquery-1.8.2.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}jquery/jquery.tmpl.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}jquery/jquery.cookie.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}assets/js/bootstrap.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}oil/js/cookies_policy.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}wstore/js/MenuPainter.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}wstore/js/EndpointManager.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}wstore/js/MessageManager.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}wstore/js/Client.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}wstore/js/UserProfile.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}wstore/js/OrganizationProfile.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}wstore/js/ModalForm.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}wstore/js/UserConfiguration.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}wstore/js/admin/OrganizationUsersForm.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}wstore/js/organizations/PageManager.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}wstore/js/Loader.js"></script>
+    
+    {% block extra_textJS %}{% endblock %}
+    {% include "oil/header_imports.html" %}
+  </head>
+  <body>
+    <div id="wrapper">
+      <div id="oil-bar">
+        {% include "oil/header.html" %}
+      </div>
+    <div id="options-bar">
+    </div>
+    <div class="left-bar">
+       {% include "organizations/org_menu_template.html" %}
+    </div>
+    {% block container %}{% endblock %}
+    </div><!-- /#wrapper -->
+    <div id="loading" class="hide"></div>
+    {% include "footer_template.html" %}
+  </body>
+</html>

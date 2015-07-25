@@ -1,0 +1,31 @@
+<div>
+    <div id="error-message">
+    </div>
+    <div class="space clear" />
+    <div class="tabbable">
+        <ul class="nav nav-tabs">
+            <li class="active">
+                <a href="#userinfo-tab" data-toggle="tab">Profile info</a>
+            </li>
+            <li>
+                <a href="#taxaddr-tab" data-toggle="tab">Tax address</a>
+            </li>
+            {% if oil %}
+            <li>
+                <a href="#expenditure-tab" data-toggle="tab">Expenditure limits</a>
+            </li>
+            {% endif %}
+            <a class="btn btn-blue tab-button" id="user-edit">Edit</a>
+        </ul>
+    </div>
+    <div class="tab-content">
+        <div class="tab-pane active" id="userinfo-tab">
+        </div>
+        <div class="tab-pane" id="taxaddr-tab">
+        </div>
+        {% if oil %}
+        <div class="tab-pane" id="expenditure-tab">
+        </div>
+        {% endif %}
+    </div>
+</div>

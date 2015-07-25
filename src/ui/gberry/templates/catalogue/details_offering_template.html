@@ -1,0 +1,45 @@
+<a class="btn btn-blue return-button" id="back"><i class="icon-arrow-left"></i></a>
+
+<div class="btn-group details-advanced-op">
+<a class="btn btn-blue dropdown-toggle" data-toggle="dropdown">Advanced operations <i class="icon-caret-down"></i></a>
+<ul class="dropdown-menu" id="advanced-op">
+</ul>
+</div>
+
+<div>
+    <div class="row">
+        <div class="main-info-container">
+            <ul class="thumbnails">
+                <li class="main-info">
+                    <h1 class="details-title">${name}</h1>
+                    <div class="img-container">
+                        <div class="img-filler" />
+                        <img src="${logo}" />
+                    </div>
+                    <div class="details-action">
+                        <div class="details-icons" id="details-stars">
+                        </div>
+                        <input id="main-action" type="button" class="btn btn-blue details-button" value="${action}" />
+                    </div>
+                    <div class="details-information">
+                        <p><b class="color-pricing">Organization: </b>${organization}</p>
+                        <p><b class="color-pricing">Owner: </b>${owner}</p>
+                        <p><b class="color-pricing">Version: </b>${version}</p>
+                        <p><b class="color-pricing">Publication date: </b>${updated}</p>
+                    </div>
+                </li>
+            </ul>
+        </div>
+        <div class="detailed-info">
+          <div class="tabbable">
+             <ul class="nav nav-tabs">
+               <li class="active"><a href="#main-tab" data-toggle="tab">Main Info</a></li>
+             </ul>
+            <div class="tab-content">
+            <div class="tab-pane active" id="main-tab">
+            </div>
+            </div>
+          </div>
+        </div>
+    </div>
+</div>
