@@ -42,34 +42,34 @@ DATABASES = {
     }
 }
 
-BASEDIR = path.dirname(path.abspath(__file__))
+BASEDIR = path.dirname(path.abspath(__file__)) # src/
+DATADIR = path.join(path.dirname(BASEDIR), 'data') # ../src/data
 
 STORE_NAME = '{{ store_name }}'
 AUTH_PROFILE_MODULE = 'wstore.models.UserProfile'
 PORTALINSTANCE = False
 OILAUTH = {{ oilauth }}
 
-THEME_ACTIVE = 'defaulttheme'
-# Local time zone for this installation.
-
 # Language code for this installation.
 LANGUAGE_CODE = 'en'
 
 SITE_ID=u'{{ site_id }}'
 
+BASE_URL = '/'
+
 # Absolute filesystem path to the directory that will hold user-uploaded files.
-MEDIA_ROOT = path.join(BASEDIR, 'media')
+MEDIA_ROOT = path.join(DATADIR, 'media')
 
 BILL_ROOT = path.join(MEDIA_ROOT, 'bills')
 
 # URL that handles the media served from MEDIA_ROOT.
-MEDIA_URL = '/media/'
+MEDIA_URL = BASE_URL + 'media/'
 
 # Absolute path to the directory static files should be collected to.
-STATIC_ROOT = path.join(BASEDIR, 'static')
+STATIC_ROOT = path.join(DATADIR, 'static')
 
 # URL prefix for static files.
-STATIC_URL = '/static/'
+STATIC_URL = BASE_URL + 'static/'
 
 # List of finder classes that know how to find static files in
 # various locations.
@@ -89,7 +89,8 @@ INSTALLED_APPS = (
     'django_mongodb_engine',
     'djangotoolbox',
     'wstore',
-    'wstore.defaulttheme',
+    'ui.fiware.defaulttheme',
+    'ui.fiware', # or ui.fiware
     'wstore.charging_engine',
     'wstore.store_commons',
     'wstore.social.tagging',
@@ -108,12 +109,12 @@ if TESTING and 'wstore.selenium_tests' in INSTALLED_APPS:
     from wstore.selenium_tests.test_settings import *
 
 if OILAUTH:
-    LOGIN_URL = "/login/fiware/"
-    LOGIN_REDIRECT_URL = '/'
-    LOGIN_ERROR_URL = '/login-error'
-    SOCIAL_AUTH_DISCONNECT_REDIRECT_URL = "/login/fiware/"
+    LOGIN_URL = BASE_URL + "login/fiware/"
+    LOGIN_REDIRECT_URL = BASE_URL
+    LOGIN_ERROR_URL = BASE_URL + 'login-error'
+    SOCIAL_AUTH_DISCONNECT_REDIRECT_URL = BASE_URL + "login/fiware/"
 else:
-    LOGIN_URL = '/login/'
+    LOGIN_URL = BASE_URL + 'login/'
 
 USDL_EDITOR_URL = "http://store.lab.fi-ware.eu/usdl-editor"
 
@@ -198,12 +199,23 @@ AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
 )
 
+# Config instructions:
+#http://forge.fiware.org/plugins/mediawiki/wiki/fiware/index.php/Store_-_W-Store_-_Installation_and_Administration_Guide#FI-WARE_Identity_management
 
 FIWARE_APP_ID = {{ client_id }}
 FIWARE_API_SECRET = '{{ client_secret }}'
+
+# NOTE: If endpoint is more than server name, remember to add '/' to end or last part will be lost.
 FIWARE_IDM_ENDPOINT = '{{ idm_endpoint }}'
 
+FIWARE_PROVIDER_ROLE = 'ST Provider'
+FIWARE_CUSTOMER_ROLE = 'ST Customer'
+FIWARE_DEVELOPER_ROLE = 'ST Developer'
+
 SOCIAL_AUTH_ENABLED_BACKENDS = ('fiware',)
+
+MARKETPLACE_USER = 'store_conwet'
+MARKETPLACE_PASSWORD = 'store_conwet'
 
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 
@@ -228,4 +240,4 @@ CLIENTS = {
 
 PAYMENT_CLIENT = CLIENTS[PAYMENT_METHOD]
 
-RESOURCE_INDEX_DIR = path.join(BASEDIR, path.join('wstore', path.join('admin', 'indexes')))
+RESOURCE_INDEX_DIR = path.join(DATADIR, path.join('admin', 'indexes'))

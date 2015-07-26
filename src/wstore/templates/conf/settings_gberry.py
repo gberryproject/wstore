@@ -18,6 +18,9 @@
 # along with WStore.
 # If not, see <https://joinup.ec.europa.eu/software/page/eupl/licence-eupl>.
 
+# NOTE: Differences to settings_template.py
+#        - Uses suburl /store
+#        - All run time data is placed to <root>/data
 
 from os import path
 
@@ -25,7 +28,7 @@ DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
-    # ('Your Name', 'your_email@example.com'),
+    ('GBerry Admin', 'admin@gberry.xyz'),
 )
 
 MANAGERS = ADMINS
@@ -33,7 +36,7 @@ MANAGERS = ADMINS
 DATABASES = {
     'default': {
         'ENGINE': 'django_mongodb_engine',  # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'wstore_db',           # Or path to database file if using sqlite3.
+        'NAME': '{{ database }}',           # Or path to database file if using sqlite3.
         'USER': '',                         # Not used with sqlite3.
         'PASSWORD': '',                     # Not used with sqlite3.
         'HOST': '',                         # Set to empty string for localhost. Not used with sqlite3.
@@ -45,15 +48,15 @@ DATABASES = {
 BASEDIR = path.dirname(path.abspath(__file__)) # src/
 DATADIR = path.join(path.dirname(BASEDIR), 'data') # ../src/data
 
-STORE_NAME = 'WStore'
+STORE_NAME = '{{ store_name }}'
 AUTH_PROFILE_MODULE = 'wstore.models.UserProfile'
 PORTALINSTANCE = False
-OILAUTH = True
+OILAUTH = {{ oilauth }}
 
 # Language code for this installation.
 LANGUAGE_CODE = 'en'
 
-SITE_ID=u''
+SITE_ID=u'{{ site_id }}'
 
 BASE_URL = '/store/'
 
@@ -89,8 +92,8 @@ INSTALLED_APPS = (
     'django_mongodb_engine',
     'djangotoolbox',
     'wstore',
-    'ui.fiware.defaulttheme',
-    'ui.fiware', # or ui.fiware
+    'ui.gberry.defaulttheme',
+    'ui.gberry', # or ui.fiware
     'wstore.charging_engine',
     'wstore.store_commons',
     'wstore.social.tagging',
@@ -108,7 +111,7 @@ TESTING = sys.argv[1:2] == ['test']
 if TESTING and 'wstore.selenium_tests' in INSTALLED_APPS:
     from wstore.selenium_tests.test_settings import *
 
-if OILAUTH:
+if OILAUTH: # this is true for GBerry
     LOGIN_URL = BASE_URL + "login/fiware/"
     LOGIN_REDIRECT_URL = BASE_URL
     LOGIN_ERROR_URL = BASE_URL + 'login-error'
@@ -154,12 +157,12 @@ MIDDLEWARE_CLASSES = (
     'wstore.store_commons.middleware.URLMiddleware',
 )
 
-WSTOREMAILUSER = '<mail_user>'
-WSTOREMAIL = '<email>'
-WSTOREMAILPASS = '<email_passwd>'
-SMTPSERVER = 'smtp.gmail.com:587'
+WSTOREMAILUSER = '{{ email_user }}'
+WSTOREMAIL = '{{ wstore_email }}'
+WSTOREMAILPASS = '{{ wstore_email_passwd }}'
+SMTPSERVER = '{{ email_smtp_server }}'
 
-WSTOREPROVIDERREQUEST = '<provider_requests_email>'
+WSTOREPROVIDERREQUEST = '{{ provider_req_email }}'
 
 URL_MIDDLEWARE_CLASSES = {
     'default': (
@@ -183,7 +186,7 @@ URL_MIDDLEWARE_CLASSES = {
     )
 }
 
-ROOT_URLCONF = 'urls'
+ROOT_URLCONF = 'urls_suburl_setup'
 
 # Python dotted path to the WSGI application used by Django's runserver.
 WSGI_APPLICATION = 'wsgi.application'
@@ -202,14 +205,15 @@ AUTHENTICATION_BACKENDS = (
 # Config instructions:
 #http://forge.fiware.org/plugins/mediawiki/wiki/fiware/index.php/Store_-_W-Store_-_Installation_and_Administration_Guide#FI-WARE_Identity_management
 
-FIWARE_APP_ID = '<app_id>'
-FIWARE_API_SECRET = '<app_secret>'
-# NOTE: If endpoint is more than server name, remember to add '/' to end or last part will be lost.
-FIWARE_IDM_ENDPOINT = 'https://account.lab.fi-ware.org'
+FIWARE_APP_ID = {{ client_id }}
+FIWARE_API_SECRET = '{{ client_secret }}'
 
-FIWARE_PROVIDER_ROLE = 'ST Provider'
-FIWARE_CUSTOMER_ROLE = 'ST Customer'
-FIWARE_DEVELOPER_ROLE = 'ST Developer'
+# NOTE: If endpoint is more than server name, remember to add '/' to end or last part will be lost.
+FIWARE_IDM_ENDPOINT = '{{ idm_endpoint }}'
+
+FIWARE_PROVIDER_ROLE = 'Provider'
+FIWARE_CUSTOMER_ROLE = 'Purchaser'
+FIWARE_DEVELOPER_ROLE = 'Developer'
 
 SOCIAL_AUTH_ENABLED_BACKENDS = ('fiware',)
 
