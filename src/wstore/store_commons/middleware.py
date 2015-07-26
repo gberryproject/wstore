@@ -18,11 +18,18 @@
 # along with WStore.
 # If not, see <https://joinup.ec.europa.eu/software/page/eupl/licence-eupl>.
 
+import logging
+import traceback
+import sys
+
+from StringIO import StringIO
+            
 from django.contrib.auth import get_user
 from django.utils.importlib import import_module
 from django.utils.functional import SimpleLazyObject
 from django.utils.http import http_date, parse_http_date_safe
 
+logger = logging.getLogger('wstore.middleware')
 
 class URLMiddleware(object):
 
@@ -77,9 +84,10 @@ class URLMiddleware(object):
 
     def get_matched_middleware(self, path, middleware_method):
 
-        if path.startswith('/api/'):
+        # NOTE: sub url setup needs to taken into account here (/store part)
+        if path.startswith('/store/api/'):
             group = 'api'
-        elif path.startswith('/media/'):
+        elif path.startswith('/store/media/'):
             group = 'media'
         else:
             group = 'default'
@@ -193,45 +201,66 @@ def get_api_user(request):
                 # used token belongs to an external application
 
                 # Get FiPay token for the user
+                # TeroV: this token might be empty if auth via store web UI has failed
                 token = user.userprofile.access_token
 
-                # Get valid user info for Fipay
-                url = FIWARE_USER_DATA_URL + '?access_token=' + token
-                request = MethodRequest('GET', url)
+                def refreshToken(user):
+                    # The access token may expired, try to refresh it
+                    social = user.social_auth.filter(provider='fiware')[0]
+                    
+                    result = social.refresh_token()
+                    
+                    # Try to get user info with the new access token
+                    social = user.social_auth.filter(provider='fiware')[0]
+                    new_credentials = social.extra_data
 
-                try:
+                    user.userprofile.access_token = new_credentials['access_token']
+                    user.userprofile.refresh_token = new_credentials['refresh_token']
+                    user.userprofile.save()
+
+                    token = user.userprofile.access_token
+                    url = FIWARE_USER_DATA_URL + '?access_token=' + token
+                    request = MethodRequest('GET', url)
                     response = opener.open(request)
                     user_info = json.loads(response.read())
-                except Exception, e:
-
-                    if e.code == 401:
-                        # The access token may expired, try to refresh it
-                        social = user.social_auth.filter(provider='fiware')[0]
-                        social.refresh_token()
-
-                        # Try to get user info with the new access token
-                        social = user.social_auth.filter(provider='fiware')[0]
-                        new_credentials = social.extra_data
-
-                        user.userprofile.access_token = new_credentials['access_token']
-                        user.userprofile.refresh_token = new_credentials['refresh_token']
-                        user.userprofile.save()
-
-                        token = user.userprofile.access_token
+                    
+                    user_info['access_token'] = token
+                    user_info['refresh_token'] = user.userprofile.refresh_token
+                    fill_internal_user_info((), response=user_info, user=user)
+                
+                # To get clear reason for unclear situation
+                if token is None:
+                    logger.debug("Token is empty")
+                    # TODO: this is not correct action, because if no original login then we don't have refresh_token either
+                    refreshToken(user)
+                    
+                else:
+                    # try to use found token
+                    try:
+                        # Get valid user info for Fipay
                         url = FIWARE_USER_DATA_URL + '?access_token=' + token
                         request = MethodRequest('GET', url)
                         response = opener.open(request)
                         user_info = json.loads(response.read())
-                    else:
-                        raise(e)
-
-                user_info['access_token'] = token
-                user_info['refresh_token'] = user.userprofile.refresh_token
-                fill_internal_user_info((), response=user_info, user=user)
+                        
+                    except Exception, e:
+                        logger.debug("Exception when calling IdM: %s" % str(e))
+                        
+                        if e.code == 401:
+                            # server responded that code is not valid
+                            logger.debug("Token was not valid -> refresh")
+                            refreshToken(user)
+                        else:
+                            raise(e)
 
         except Exception, e:
+            io = StringIO()
+            traceback.print_exc(io)
+            logger.error("User authentication failed. Returning AnonymousUser: %s" % io.getvalue())
+            
             user = AnonymousUser()
-    else:
+            
+    else: # Non OILAUTH case
         try:
             user = Token.objects.get(token=token).user
         except:
