@@ -1,6 +1,9 @@
 README
 ======
 
+This is branched version from original FIWare WStore. See 
+[changes](CHANGES_GBERRY.md).
+
 Requirements
 ------------
 
