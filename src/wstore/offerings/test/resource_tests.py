@@ -174,8 +174,9 @@ class ResourceRegisteringTestCase(TestCase):
                 else:
                     f_name = data['content']['name']
 
-                self.assertEquals(res.resource_path, '/media/resources/' + 'test_user__' + data['name'] + '__' + data['version'] + '__' + f_name)
-                res_path = settings.BASEDIR + res.resource_path
+                self.assertEquals(res.resource_path, settings.BASE_URL + 'media/resources/' + 'test_user__' + data['name'] + '__' + data['version'] + '__' + f_name)
+                pathSuffix = res.resource_path.replace(settings.BASE_URL, '/', 1)
+                res_path = settings.DATADIR + pathSuffix
                 os.remove(res_path)
             elif 'link' in data:
                 self.assertEquals(res.download_link, data['link'])
@@ -379,7 +380,7 @@ class ResourceDeletionTestCase(TestCase):
         os.remove = MagicMock()
 
     def _check_deleted(self):
-        os.remove.assert_called_once_with(os.path.join(settings.BASEDIR, 'media/resources/test_resource'))
+        os.remove.assert_called_once_with(os.path.join(settings.DATADIR, 'media/resources/test_resource'))
         self.resource.delete.assert_called_once_with()
 
     def _res_url(self):

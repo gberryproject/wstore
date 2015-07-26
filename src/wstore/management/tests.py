@@ -89,7 +89,7 @@ class IndexTestCase(TestCase):
         call_command(info['command'], *args, **opts)
 
         if completed:
-            index_path = os.path.join(settings.BASEDIR, 'wstore')
+            index_path = settings.DATADIR
             index_path = os.path.join(index_path, info['module'])
             index_path = os.path.join(index_path, 'indexes')
 

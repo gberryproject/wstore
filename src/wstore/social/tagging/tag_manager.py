@@ -37,8 +37,7 @@ class TagManager():
         if not index_path:
 
             from django.conf import settings
-            base = settings.BASEDIR
-            self._index_path = path.join(base, 'wstore')
+            self._index_path = settings.DATADIR
             self._index_path = path.join(self._index_path, 'social')
             self._index_path = path.join(self._index_path, 'indexes')
         else:

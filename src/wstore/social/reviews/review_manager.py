@@ -150,7 +150,7 @@ class ReviewManager():
         offering.save()
 
         # Update offering indexes
-        index_path = os.path.join(settings.BASEDIR, 'wstore')
+        index_path = settings.DATADIR
         index_path = os.path.join(index_path, 'search')
         index_path = os.path.join(index_path, 'indexes')
 
@@ -246,7 +246,7 @@ class ReviewManager():
         rev.offering.save()
 
         # Update offering indexes
-        index_path = os.path.join(settings.BASEDIR, 'wstore')
+        index_path = settings.DATADIR
         index_path = os.path.join(index_path, 'search')
         index_path = os.path.join(index_path, 'indexes')
 
@@ -283,7 +283,7 @@ class ReviewManager():
         rev.offering.save()
 
         # Update offering indexes
-        index_path = os.path.join(settings.BASEDIR, 'wstore')
+        index_path = settings.DATADIR
         index_path = os.path.join(index_path, 'search')
         index_path = os.path.join(index_path, 'indexes')
 

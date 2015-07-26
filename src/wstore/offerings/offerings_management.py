@@ -597,7 +597,7 @@ def create_offering(provider, json_data):
         bind_resources(offering, json_data['resources'], profile.user)
 
     # Load offering document to the search index
-    index_path = os.path.join(settings.BASEDIR, 'wstore')
+    index_path = settings.DATADIR
     index_path = os.path.join(index_path, 'search')
     index_path = os.path.join(index_path, 'indexes')
 
@@ -618,7 +618,7 @@ def update_offering(offering, data):
     # Update the logo
     if 'image' in data:
         logo_path = offering.image_url
-        logo_path = os.path.join(settings.BASEDIR, logo_path[1:])
+        logo_path = os.path.join(settings.DATADIR, logo_path[1:])
 
         # Remove the old logo
         os.remove(logo_path)
@@ -635,7 +635,7 @@ def update_offering(offering, data):
 
         # Delete old related images
         for img in offering.related_images:
-            old_image = os.path.join(settings.BASEDIR, img[1:])
+            old_image = os.path.join(settings.DATADIR, img[1:])
             os.remove(old_image)
 
         offering.related_images = []
@@ -744,7 +744,7 @@ def update_offering(offering, data):
     offering.save()
 
     # Update offering indexes
-    index_path = os.path.join(settings.BASEDIR, 'wstore')
+    index_path = settings.DATADIR
     index_path = os.path.join(index_path, 'search')
     index_path = os.path.join(index_path, 'indexes')
 
@@ -788,7 +788,7 @@ def publish_offering(offering, data):
     offering.save()
 
     # Update offering indexes
-    index_path = os.path.join(settings.BASEDIR, 'wstore')
+    index_path = settings.DATADIR
     index_path = os.path.join(index_path, 'search')
     index_path = os.path.join(index_path, 'indexes')
 
@@ -849,7 +849,7 @@ def delete_offering(offering):
     repository_adaptor = RepositoryAdaptor(host, collection)
     repository_adaptor.delete(path[4])
 
-    index_path = os.path.join(settings.BASEDIR, 'wstore')
+    index_path = settings.DATADIR
     index_path = os.path.join(index_path, 'search')
     index_path = os.path.join(index_path, 'indexes')
 

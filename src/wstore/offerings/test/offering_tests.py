@@ -370,11 +370,11 @@ class OfferingCreationTestCase(TestCase):
             self.assertEqual(content['name'], offering_data['name'])
             self.assertEqual(content['version'], offering_data['version'])
             self.assertEqual(content['state'], 'uploaded')
-            self.assertEqual(content['image_url'], expected_data['image'])
+            self.assertEqual(content['image_url'], expected_data['image'].replace('/', settings.BASE_URL, 1))
             self.assertEqual(content['description_url'], expected_data['description_url'])
 
             if 'screenshots' in expected_data:
-                self.assertEquals(content['related_images'], expected_data['screenshots'])
+                self.assertEquals(content['related_images'], expected_data['screenshots'].replace('/', settings.BASE_URL, 1))
 
             if 'applications' in offering_data:
                 self.assertEquals(content['applications'], offering_data['applications'])
@@ -477,12 +477,14 @@ class OfferingUpdateTestCase(TestCase):
 
     @classmethod
     def setUpClass(cls):
-        path = os.path.join(settings.BASEDIR, 'wstore/test/')
+        path = os.path.join(settings.DATADIR, 'test/')
         cls.test_dir = os.path.join(path, 'test_organization__test_offering2__1.0')
         # Create test offering media dir
-        os.makedirs(cls.test_dir)
+        if not os.path.exists(cls.test_dir):
+            os.makedirs(cls.test_dir)
 
         # loads test USDL
+        testDataPath = os.path.join(settings.BASEDIR, 'wstore/test/')
         f = open(os.path.join(path, 'test_usdl.rdf'), 'rb')
         cls._usdl = f.read()
         super(OfferingUpdateTestCase, cls).setUpClass()
@@ -513,7 +515,7 @@ class OfferingUpdateTestCase(TestCase):
         except:
             pass
         reload(offerings_management)
-        settings.MEDIA_ROOT = os.path.join(settings.BASEDIR, 'media')
+        settings.MEDIA_ROOT = os.path.join(settings.DATADIR, 'media')
 
     def _serialize(self, type_):
         graph = rdflib.Graph()
@@ -666,7 +668,7 @@ class OfferingUpdateTestCase(TestCase):
 
             if 'image' in data:
                 # Check deletion of old image
-                offerings_management.os.remove.assertCall(os.path.join(settings.BASEDIR, 'wstore/test/test_organization__test_offering2__1.0/image.png'))
+                offerings_management.os.remove.assertCall(os.path.join(settings.DATADIR, 'test/test_organization__test_offering2__1.0/image.png'))
 
                 f = open(os.path.join(self.test_dir, data['image']['name']), "rb")
                 content = f.read()
@@ -675,7 +677,7 @@ class OfferingUpdateTestCase(TestCase):
 
             if 'related_images' in data:
 
-                os.remove.assertCall(os.path.join(settings.BASEDIR, 'wstore/test/test_organization__test_offering2__1.0/screen1.png'))
+                os.remove.assertCall(os.path.join(settings.DATADIR, 'test/test_organization__test_offering2__1.0/screen1.png'))
 
                 for img in data['related_images']:
                     f = open(os.path.join(self.test_dir, img['name']), "rb")

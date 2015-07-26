@@ -203,7 +203,7 @@ def get_provider_resources(provider, filter_=None):
 def _remove_resource(resource):
     # Delete files if needed
     if resource.resource_path:
-        path = os.path.join(settings.BASEDIR, resource.resource_path[1:])
+        path = os.path.join(settings.DATADIR, resource.resource_path[1:])
         os.remove(path)
 
     resource.delete()

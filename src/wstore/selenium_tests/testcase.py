@@ -188,7 +188,7 @@ class WStoreSeleniumTestCase(TestCase, LiveServerTestCase):
             self.driver.find_element_by_id('notify').send_keys(offering_info['notification'])
 
         # Add the logo
-        logo_path = os.path.join(settings.BASEDIR, 'wstore/defaulttheme/static/assets/img/noimage.png')
+        logo_path = os.path.join(settings.BASEDIR, 'wstore/ui/fiware/defaulttheme/static/assets/img/noimage.png')
         self.driver.find_element_by_id('img-logo').send_keys(logo_path)
 
         # Mark as open if needed

@@ -87,7 +87,7 @@ def rollback(purchase):
                 profile.save()
 
     # Update offering indexes: Offering index must be updated in any case
-    index_path = os.path.join(settings.BASEDIR, 'wstore')
+    index_path = settings.DATADIR
     index_path = os.path.join(index_path, 'search')
     index_path = os.path.join(index_path, 'indexes')
 

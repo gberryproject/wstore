@@ -80,7 +80,7 @@ class IndexCreationTestCase(TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        path = settings.BASEDIR + '/wstore/test/test_index'
+        path = settings.DATADIR + '/test/test_index'
         files = os.listdir(path)
         for f in files:
             file_path = os.path.join(path, f)
@@ -91,11 +91,11 @@ class IndexCreationTestCase(TestCase):
     def test_basic_index_creaton(self):
 
         offering = Offering.objects.get(name='test_offering')
-        se = SearchEngine(settings.BASEDIR + '/wstore/test/test_index')
+        se = SearchEngine(settings.DATADIR + '/test/test_index')
         se.create_index(offering)
 
         # Get the index reader
-        index = open_dir(settings.BASEDIR + '/wstore/test/test_index')
+        index = open_dir(settings.DATADIR + '/test/test_index')
 
         with index.searcher() as searcher:
             query = QueryParser('content', index.schema).parse(unicode('widget'))
@@ -108,7 +108,7 @@ class IndexCreationTestCase(TestCase):
 
 def _create_index(user):
 
-    index_path = settings.BASEDIR + '/wstore/test/test_index'
+    index_path = settings.DATADIR + '/test/test_index'
     os.makedirs(index_path)
 
     schema = Schema(
@@ -158,7 +158,7 @@ def _create_index(user):
     index_writer.commit()
 
 def _remove_index(ins, off=None, sa=None):
-    path = settings.BASEDIR + '/wstore/test/test_index'
+    path = settings.DATADIR + '/test/test_index'
     files = os.listdir(path)
     for f in files:
         file_path = os.path.join(path, f)
@@ -198,7 +198,7 @@ class FullTextSearchTestCase(TestCase):
             o.owner_organization = user.userprofile.current_organization
             o.save()
 
-        if os.path.exists(settings.BASEDIR + '/wstore/test/test_index'):
+        if os.path.exists(settings.DATADIR + '/test/test_index'):
             _remove_index(self)
 
         _create_index(user)
@@ -228,7 +228,7 @@ class FullTextSearchTestCase(TestCase):
             side_effect(self)
 
         # Create the search engine
-        se = SearchEngine(settings.BASEDIR + '/wstore/test/test_index')
+        se = SearchEngine(settings.DATADIR + '/test/test_index')
 
         # Call full text search
         error = None
@@ -290,7 +290,7 @@ class UpdateIndexTestCase(TestCase):
             o.owner_organization = user.userprofile.current_organization
             o.save()
 
-        if os.path.exists(settings.BASEDIR + '/wstore/test/test_index'):
+        if os.path.exists(settings.DATADIR + '/test/test_index'):
             _remove_index(self)
 
         _create_index(user)
@@ -341,7 +341,7 @@ class UpdateIndexTestCase(TestCase):
             off = Offering.objects.get(pk=offering)
 
         # Create the search engine
-        se = SearchEngine(settings.BASEDIR + '/wstore/test/test_index')
+        se = SearchEngine(settings.DATADIR + '/test/test_index')
 
         # Call the update method
         update_method(self, off, sa=se)
@@ -355,7 +355,7 @@ class UpdateIndexTestCase(TestCase):
 
         if not err_type:
             self.assertEquals(error, None)
-            index = open_dir(settings.BASEDIR + '/wstore/test/test_index')
+            index = open_dir(settings.DATADIR + '/test/test_index')
 
             with index.searcher() as searcher:
                 if owned:

@@ -83,7 +83,7 @@ def _fill_provider_role(username):
 
 
 def _create_indexes():
-    index_path = os.path.join(settings.BASEDIR, 'wstore')
+    index_path = settings.DATADIR
     index_path = os.path.join(index_path, 'search')
     index_path = os.path.join(index_path, 'indexes')
 
@@ -116,9 +116,9 @@ class BasicSearchTestCase(WStoreSeleniumTestCase):
     def setUp(self):
         # Fill offering info
         # Create test directories
-        offering_path1 = os.path.join(settings.BASEDIR, 'media/provider__test_offering1__1.0')
-        offering_path2 = os.path.join(settings.BASEDIR, 'media/provider__test_offering2__1.0')
-        offering_path3 = os.path.join(settings.BASEDIR, 'media/provider__test_offering3__1.0')
+        offering_path1 = os.path.join(settings.DATADIR, 'media/provider__test_offering1__1.0')
+        offering_path2 = os.path.join(settings.DATADIR, 'media/provider__test_offering2__1.0')
+        offering_path3 = os.path.join(settings.DATADIR, 'media/provider__test_offering3__1.0')
         os.makedirs(offering_path1)
         os.makedirs(offering_path2)
         os.makedirs(offering_path3)
@@ -127,7 +127,7 @@ class BasicSearchTestCase(WStoreSeleniumTestCase):
         self._dirs_to_remove.append(offering_path2)
         self._dirs_to_remove.append(offering_path3)
 
-        test_icon_path = os.path.join(settings.BASEDIR, 'wstore/defaulttheme/static/assets/img/noimage.png')
+        test_icon_path = os.path.join(settings.BASEDIR, 'wstore/ui/fiware/defaulttheme/static/assets/img/noimage.png')
         shutil.copy2(test_icon_path, os.path.join(offering_path1, 'image.png'))
         shutil.copy2(test_icon_path, os.path.join(offering_path2, 'image.png'))
         shutil.copy2(test_icon_path, os.path.join(offering_path3, 'image.png'))
@@ -286,7 +286,7 @@ class OfferingManagementTestCase(WStoreSeleniumTestCase):
             except:
                 pass
 
-        path = os.path.join(settings.BASEDIR, 'media/provider__test_offering__1.0')
+        path = os.path.join(settings.DATADIR, 'media/provider__test_offering__1.0')
         try:
             files = os.listdir(path)
             for f in files:
@@ -381,7 +381,7 @@ class PurchaseTestCase(WStoreSeleniumTestCase):
         # Remove bills if needed
         for p in Purchase.objects.all():
             for bill in p.bill:
-                path = os.path.join(settings.BASEDIR, bill[1:])
+                path = os.path.join(settings.DATADIR, bill[1:])
                 try:
                     os.remove(path)
                 except:

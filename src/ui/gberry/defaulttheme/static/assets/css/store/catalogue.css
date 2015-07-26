@@ -1,0 +1,115 @@
+
+.store-menu .icon-credit-card {
+  font-size: 20px;
+  position: relative;
+  top: 10px;
+  left: 8px;
+  color: rgb(255,255,255);
+}
+
+.store-menu .icon-cloud-upload {
+  font-size: 22px;
+  position: relative;
+  top: -31px;
+  left: 8px;
+  color: rgb(0, 45, 103);
+}
+
+.catalogue-form {
+  position: fixed;
+  top: 51px;
+  right: 0;
+  height: 40px;
+  width: 486px;
+}
+
+#provider-options {
+  position: absolute;
+  top: 51px;
+  left: 240px;
+}
+
+.offerings-scroll-container {
+  overflow: auto;
+  position: absolute;
+  top: 180px;
+  left: 0px;
+  width: 100%;
+}
+
+.offerings-container {
+  width: 1293px;
+  position: absolute;
+  left: 50%;
+  margin-left: -525px;
+  top: 0;
+}
+
+/* Search components position depends on the window size */
+@media all and (max-width: 1600px) {
+  .offerings-container {
+     width: 960px;
+     margin-left: -375px;
+  }
+}
+
+@media all and (max-width: 1211px) {
+  .offerings-container {
+     width: 640px;
+     margin-left: -213px;
+  }
+}
+
+#catalogue-title {
+  position: absolute;
+  top: 132px;
+  font-size: 30px;
+}
+
+#open-help {
+  position: relative;
+  top: 4px;
+  left: 4px;
+}
+
+.resource-options i {
+  font-size: 12px;
+}
+
+.resource-options .res-edit {
+  float: right;
+}
+
+.resource-options .res-remove {
+  float: right;
+  margin-left: 5px;
+}
+
+.resource-options .res-upgrade {
+  float: right;
+  margin-left: 5px;
+}
+
+.resource-details dd {
+  border-top: 1px solid rgb(193, 193, 193);
+  padding-top: 6px;
+  overflow: hidden;
+}
+
+.res-det-title {
+  margin-bottom: 0;
+}
+
+@media all and (max-width: 980px) {
+  #catalogue-container {
+     position: absolute;
+     left: 0;
+     top: -170px;
+  }
+}
+
+@media all and (max-width: 900px) {
+  .offerings-container {
+     margin-left: -304px;
+  }
+}

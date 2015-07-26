@@ -86,11 +86,11 @@ def mock_request(method, url, data, headers):
 
 
 def _save_ixdir(orig_info, dest_info):
-    index_path = os.path.join(settings.BASEDIR, 'wstore')
+    index_path = settings.DATADIR
     index_path = os.path.join(index_path, orig_info['module'])
     index_path = os.path.join(index_path, orig_info['name'])
 
-    destination_path = os.path.join(settings.BASEDIR, 'wstore')
+    destination_path = settings.DATADIR
     destination_path = os.path.join(destination_path, dest_info['module'])
     destination_path = os.path.join(destination_path, dest_info['name'])
 
@@ -98,7 +98,7 @@ def _save_ixdir(orig_info, dest_info):
 
 
 def _restore_ixdir(orig_info, dest_info):
-    index_path = os.path.join(settings.BASEDIR, 'wstore')
+    index_path = settings.DATADIR
     index_path = os.path.join(index_path, orig_info['module'])
     index_path = os.path.join(index_path, orig_info['name'])
 
@@ -107,7 +107,7 @@ def _restore_ixdir(orig_info, dest_info):
     except:
         pass
 
-    destination_path = os.path.join(settings.BASEDIR, 'wstore')
+    destination_path = settings.DATADIR
     destination_path = os.path.join(destination_path, dest_info['module'])
     destination_path = os.path.join(destination_path, dest_info['name'])
 

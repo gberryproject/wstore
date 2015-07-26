@@ -144,7 +144,7 @@ class TagManagementTestCase(TestCase):
     def setUpClass(cls):
         from os import path
         from django.conf import settings
-        cls._path = path.join(settings.BASEDIR, 'wstore')
+        cls._path = settings.DATADIR
         cls._path = path.join(cls._path, 'test')
         cls._path = path.join(cls._path, 'test_index')
         super(TagManagementTestCase, cls).setUpClass()
@@ -242,7 +242,7 @@ class TagManagementTestCase(TestCase):
         path = self._path
         if ix_path:
             from django.conf import settings
-            path = os.path.join(settings.BASEDIR, ix_path)
+            path = os.path.join(settings.DATADIR, ix_path)
 
         # Build the tag manager
         tm = tag_manager.TagManager(path)
@@ -402,7 +402,7 @@ class RecommendationProcessTestCase(TestCase):
     def setUpClass(cls):
         from os import path
         from django.conf import settings
-        cls._path = path.join(settings.BASEDIR, 'wstore')
+        cls._path = settings.DATADIR
         cls._path = path.join(cls._path, 'test')
         cls._path = path.join(cls._path, 'test_index2')
         super(RecommendationProcessTestCase, cls).setUpClass()
