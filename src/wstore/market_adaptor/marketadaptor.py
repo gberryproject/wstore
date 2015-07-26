@@ -19,23 +19,43 @@
 # If not, see <https://joinup.ec.europa.eu/software/page/eupl/licence-eupl>.
 
 import urllib2
+import logging
 from urllib2 import HTTPError
 from urllib import urlencode
 from urlparse import urljoin, urlparse
 
+from django.conf import settings
+
 from wstore.store_commons.utils.method_request import MethodRequest
 from wstore.store_commons.utils.url import url_fix
 
+logger = logging.getLogger('wstore.marketadaptor')
 
 class MarketAdaptor(object):
 
     _marketplace_uri = None
     _session_id = None
 
-    def __init__(self, marketplace_uri, user='store_conwet', passwd='store_conwet'):
+    def __init__(self, marketplace_uri, user=None, passwd=None):
         self._marketplace_uri = marketplace_uri
-        self._user = user
-        self._passwd = passwd
+        
+        if user:
+            self._user = user
+        elif hasattr(settings, "MARKETPLACE_USER"):
+                self._user = settings.MARKETPLACE_USER
+        else:
+            logger.warning("Using default Marketplace user name. Please define MARKETPLACE_USER in settings.py")
+            self._user = "store_conwet"
+            
+        if passwd:
+            self._passwd = passwd
+            
+        elif hasattr(settings, "MARKETPLACE_PASSWORD"):
+                self._passwd = settings.MARKETPLACE_PASSWORD
+        else:
+            logger.warning("Using default Marketplace user password. Please define MARKETPLACE_PASSWORD in settings.py")
+            self._passwd = "store_conwet"
+        
 
     def authenticate(self):
 
