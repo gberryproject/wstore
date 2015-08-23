@@ -21,10 +21,14 @@
 from __future__ import unicode_literals
 
 import json
+import logging
 import rdflib
 import re
 import base64
 import os
+import traceback
+
+from StringIO import StringIO
 from datetime import datetime
 from pymongo import MongoClient
 from bson.objectid import ObjectId
@@ -49,6 +53,9 @@ from wstore.store_commons.utils.name import is_valid_id
 from wstore.store_commons.utils.url import is_valid_url
 from wstore.social.tagging.tag_manager import TagManager
 
+logger = logging.getLogger('wstore.offerings.offerings_management')
+
+####
 
 def get_offering_info(offering, user):
 
@@ -370,242 +377,263 @@ def _validate_offering_info(offering_info):
 # the repository uploads
 @OfferingRollback
 def create_offering(provider, json_data):
-
-    profile = provider.userprofile
-    data = {}
-    if not 'name' in json_data or not 'version' in json_data:
-        raise ValueError('Missing required fields')
-
-    data['name'] = json_data['name']
-    data['version'] = json_data['version']
-
-    if not re.match(re.compile(r'^(?:[1-9]\d*\.|0\.)*(?:[1-9]\d*|0)$'), data['version']):
-        raise ValueError('Invalid version format')
-
-    if not is_valid_id(data['name']):
-        raise ValueError('Invalid name format')
-
-    # Get organization
-    organization = profile.current_organization
-
-    # Check if the offering already exists
-    existing = True
-
-    try:
-        Offering.objects.get(name=data['name'], owner_organization=organization, version=data['version'])
-    except:
-        existing = False
-
-    if existing:
-        raise Exception('The offering already exists')
-
-    # Check if the version of the offering is lower than an existing one
-    offerings = Offering.objects.filter(owner_organization=organization, name=data['name'])
-    for off in offerings:
-        if is_lower_version(data['version'], off.version):
-            raise ValueError('A bigger version of the current offering exists')
-
-    is_open = json_data.get('open', False)
-
-    # If using the idm, get the applications from the request
-    if settings.OILAUTH:
-
-        # Validate application structure
-        data['applications'] = []
-
-        for app in json_data['applications']:
-            data['applications'].append({
-                'name': app['name'],
-                'url': app['url'],
-                'id': app['id'],
-                'description': app['description']
-            })
-
-    data['related_images'] = []
-
-    # Check the URL to notify the provider
-    notification_url = ''
-
-    if 'notification_url' in json_data:
-        if json_data['notification_url'] == 'default':
-            notification_url = organization.notification_url
-            if not notification_url:
-                raise ValueError('There is not a default notification URL defined for the organization ' + organization.name + '. To configure a default notification URL provide it in the settings menu')
+    try: 
+        logger.debug('create_offering()')
+        profile = provider.userprofile
+        data = {}
+        if not 'name' in json_data or not 'version' in json_data:
+            raise ValueError('Missing required fields')
+    
+        data['name'] = json_data['name']
+        data['version'] = json_data['version']
+    
+        if not re.match(re.compile(r'^(?:[1-9]\d*\.|0\.)*(?:[1-9]\d*|0)$'), data['version']):
+            raise ValueError('Invalid version format')
+    
+        if not is_valid_id(data['name']):
+            raise ValueError('Invalid name format')
+    
+        # Get organization
+        organization = profile.current_organization
+        
+        logger.debug('create_offering(): checking existing offerings')
+        # Check if the offering already exists
+        existing = True
+    
+        try:
+            Offering.objects.get(name=data['name'], owner_organization=organization, version=data['version'])
+        except:
+            existing = False
+    
+        if existing:
+            raise Exception('The offering already exists')
+    
+        # Check if the version of the offering is lower than an existing one
+        offerings = Offering.objects.filter(owner_organization=organization, name=data['name'])
+        for off in offerings:
+            if is_lower_version(data['version'], off.version):
+                raise ValueError('A bigger version of the current offering exists')
+    
+        is_open = json_data.get('open', False)
+    
+        logger.debug('create_offering(): before authentication')
+        
+        # If using the idm, get the applications from the request
+        if settings.OILAUTH:
+    
+            # Validate application structure
+            data['applications'] = []
+    
+            for app in json_data['applications']:
+                data['applications'].append({
+                    'name': app['name'],
+                    'url': app['url'],
+                    'id': app['id'],
+                    'description': app['description']
+                })
+    
+        data['related_images'] = []
+        
+        logger.debug('create_offering(): before notication URL')
+        # Check the URL to notify the provider
+        notification_url = ''
+    
+        if 'notification_url' in json_data:
+            if json_data['notification_url'] == 'default':
+                notification_url = organization.notification_url
+                if not notification_url:
+                    raise ValueError('There is not a default notification URL defined for the organization ' + organization.name + '. To configure a default notification URL provide it in the settings menu')
+            else:
+                # Check the notification URL
+                if not is_valid_url(json_data['notification_url']):
+                    raise ValueError("Invalid notification URL format: It doesn't seem to be an URL")
+    
+                notification_url = json_data['notification_url']
+    
+        logger.debug('create_offering(): create app media directory')
+        # Create the directory for app media
+        dir_name = organization.name + '__' + data['name'] + '__' + data['version']
+        path = os.path.join(settings.MEDIA_ROOT, dir_name)
+        os.makedirs(path)
+    
+        if not 'image' in json_data:
+            raise ValueError('Missing required field: Logo')
+    
+        if not isinstance(json_data['image'], dict):
+            raise TypeError('Invalid image type')
+    
+        logger.debug('create_offering(): image handling')
+        
+        image = json_data['image']
+    
+        if not 'name' in image or not 'data' in image:
+            raise ValueError('Missing required field in image')
+    
+        # Save the application image or logo
+        f = open(os.path.join(path, image['name']), "wb")
+        dec = base64.b64decode(image['data'])
+        f.write(dec)
+        f.close()
+    
+        data['image_url'] = settings.MEDIA_URL + dir_name + '/' + image['name']
+        # Save screen shots
+        if 'related_images' in json_data:
+            for image in json_data['related_images']:
+    
+                # images must be encoded in base64 format
+                f = open(os.path.join(path, image['name']), "wb")
+                dec = base64.b64decode(image['data'])
+                f.write(dec)
+                f.close()
+    
+                data['related_images'].append(settings.MEDIA_URL + dir_name + '/' + image['name'])
+    
+        # Save USDL document
+        # If the USDL itself is provided
+    
+        if 'offering_description' in json_data:
+            logger.debug('create_offering(): USDL upload')
+            usdl_info = json_data['offering_description']
+    
+            repository = Repository.objects.get(name=json_data['repository'])
+            repository_adaptor = RepositoryAdaptor(repository.host, 'storeOfferingCollection')
+            offering_id = organization.name + '__' + data['name'] + '__' + data['version']
+    
+            usdl = usdl_info['data']
+            data['description_url'] = repository_adaptor.upload(usdl_info['content_type'], usdl_info['data'], name=offering_id)
+    
+        # If the USDL is already uploaded in the repository
+        elif 'description_url' in json_data:
+            logger.debug('create_offering(): using url for USDL')
+            
+            # Check that the link to USDL is unique since could be used to
+            # purchase offerings from Marketplace
+            usdl_info = {}
+            usdl_url = json_data['description_url']
+            off = Offering.objects.filter(description_url=usdl_url)
+    
+            if len(off) != 0:
+                raise ValueError('The provided USDL description is already registered')
+    
+            # Download the USDL from the repository
+            repository_adaptor = RepositoryAdaptor(usdl_url)
+            accept = "text/plain; application/rdf+xml; text/turtle; text/n3"
+    
+            usdl = repository_adaptor.download(content_type=accept)
+            usdl_info['content_type'] = usdl['content_type']
+    
+            usdl = usdl['data']
+            data['description_url'] = usdl_url
+    
+        # If the USDL is going to be created
+        elif 'offering_info' in json_data:
+            logger.debug('create_offering(): create basic USDL')
+            
+            _validate_offering_info(json_data['offering_info'])
+    
+            offering_info = json_data['offering_info']
+            offering_info['image_url'] = data['image_url']
+            offering_info['name'] = data['name']
+    
+            repository = Repository.objects.get(name=json_data['repository'])
+    
+            offering_info['base_uri'] = repository.host
+    
+            usdl = _create_basic_usdl(offering_info)
+            usdl_info = {
+                'content_type': 'application/rdf+xml'
+            }
+    
+            repository_adaptor = RepositoryAdaptor(repository.host, 'storeOfferingCollection')
+            offering_id = organization.name + '__' + data['name'] + '__' + data['version']
+            data['description_url'] = repository_adaptor.upload(usdl_info['content_type'], usdl, name=offering_id)
         else:
-            # Check the notification URL
-            if not is_valid_url(json_data['notification_url']):
-                raise ValueError("Invalid notification URL format: It doesn't seem to be an URL")
-
-            notification_url = json_data['notification_url']
-
-    # Create the directory for app media
-    dir_name = organization.name + '__' + data['name'] + '__' + data['version']
-    path = os.path.join(settings.MEDIA_ROOT, dir_name)
-    os.makedirs(path)
-
-    if not 'image' in json_data:
-        raise ValueError('Missing required field: Logo')
-
-    if not isinstance(json_data['image'], dict):
-        raise TypeError('Invalid image type')
-
-    image = json_data['image']
-
-    if not 'name' in image or not 'data' in image:
-        raise ValueError('Missing required field in image')
-
-    # Save the application image or logo
-    f = open(os.path.join(path, image['name']), "wb")
-    dec = base64.b64decode(image['data'])
-    f.write(dec)
-    f.close()
-
-    data['image_url'] = settings.MEDIA_URL + dir_name + '/' + image['name']
-    # Save screen shots
-    if 'related_images' in json_data:
-        for image in json_data['related_images']:
-
-            # images must be encoded in base64 format
-            f = open(os.path.join(path, image['name']), "wb")
-            dec = base64.b64decode(image['data'])
-            f.write(dec)
-            f.close()
-
-            data['related_images'].append(settings.MEDIA_URL + dir_name + '/' + image['name'])
-
-    # Save USDL document
-    # If the USDL itself is provided
-
-    if 'offering_description' in json_data:
-        usdl_info = json_data['offering_description']
-
-        repository = Repository.objects.get(name=json_data['repository'])
-        repository_adaptor = RepositoryAdaptor(repository.host, 'storeOfferingCollection')
-        offering_id = organization.name + '__' + data['name'] + '__' + data['version']
-
-        usdl = usdl_info['data']
-        data['description_url'] = repository_adaptor.upload(usdl_info['content_type'], usdl_info['data'], name=offering_id)
-
-    # If the USDL is already uploaded in the repository
-    elif 'description_url' in json_data:
-
-        # Check that the link to USDL is unique since could be used to
-        # purchase offerings from Marketplace
-        usdl_info = {}
-        usdl_url = json_data['description_url']
-        off = Offering.objects.filter(description_url=usdl_url)
-
-        if len(off) != 0:
-            raise ValueError('The provided USDL description is already registered')
-
-        # Download the USDL from the repository
-        repository_adaptor = RepositoryAdaptor(usdl_url)
-        accept = "text/plain; application/rdf+xml; text/turtle; text/n3"
-
-        usdl = repository_adaptor.download(content_type=accept)
-        usdl_info['content_type'] = usdl['content_type']
-
-        usdl = usdl['data']
-        data['description_url'] = usdl_url
-
-    # If the USDL is going to be created
-    elif 'offering_info' in json_data:
-
-        _validate_offering_info(json_data['offering_info'])
-
-        offering_info = json_data['offering_info']
-        offering_info['image_url'] = data['image_url']
-        offering_info['name'] = data['name']
-
-        repository = Repository.objects.get(name=json_data['repository'])
-
-        offering_info['base_uri'] = repository.host
-
-        usdl = _create_basic_usdl(offering_info)
-        usdl_info = {
-            'content_type': 'application/rdf+xml'
-        }
-
-        repository_adaptor = RepositoryAdaptor(repository.host, 'storeOfferingCollection')
-        offering_id = organization.name + '__' + data['name'] + '__' + data['version']
-        data['description_url'] = repository_adaptor.upload(usdl_info['content_type'], usdl, name=offering_id)
-    else:
-        raise Exception('No USDL description provided')
-
-    # Validate the USDL
-    data['open'] = is_open
-    data['organization'] = organization
-    valid = validate_usdl(usdl, usdl_info['content_type'], data)
-
-    if not valid[0]:
-        raise Exception(valid[1])
-
-    # Check new currencies used
-    if len(valid) > 2:
-        new_curr = valid[2]
-
-        # Set the currency as used
-        cont = Context.objects.all()[0]
-        currency = None
-        # Search the currency
-        for c in cont.allowed_currencies['allowed']:
-            if c['currency'].lower() == new_curr.lower():
-                currency = c
-                break
-
-        cont.allowed_currencies['allowed'].remove(currency)
-        currency['in_use'] = True
-        cont.allowed_currencies['allowed'].append(currency)
-        cont.save()
-
-    # Serialize and store USDL info in json-ld format
-    graph = rdflib.Graph()
-    rdf_format = usdl_info['content_type']
-
-    if rdf_format == 'text/turtle' or rdf_format == 'text/plain':
-            rdf_format = 'n3'
-    elif rdf_format == 'application/json':
-            rdf_format = 'json-ld'
-
-    graph.parse(data=usdl, format=rdf_format)
-    data['offering_description'] = graph.serialize(format='json-ld', auto_compact=True)
-
-    # Create the offering
-    offering = Offering.objects.create(
-        name=data['name'],
-        owner_organization=organization,
-        owner_admin_user=provider,
-        version=data['version'],
-        state='uploaded',
-        description_url=data['description_url'],
-        resources=[],
-        comments=[],
-        tags=[],
-        image_url=data['image_url'],
-        related_images=data['related_images'],
-        offering_description=json.loads(data['offering_description']),
-        notification_url=notification_url,
-        creation_date=datetime.now(),
-        open=is_open
-    )
-
-    if settings.OILAUTH:
-        offering.applications = data['applications']
-        offering.save()
-
-    if 'resources' in json_data and len(json_data['resources']) > 0:
-        bind_resources(offering, json_data['resources'], profile.user)
-
-    # Load offering document to the search index
-    index_path = settings.DATADIR
-    index_path = os.path.join(index_path, 'search')
-    index_path = os.path.join(index_path, 'indexes')
-
-    search_engine = SearchEngine(index_path)
-    search_engine.create_index(offering)
+            raise Exception('No USDL description provided')
+    
+        logger.debug('create_offering(): validating USDL')
+        
+        # Validate the USDL
+        data['open'] = is_open
+        data['organization'] = organization
+        valid = validate_usdl(usdl, usdl_info['content_type'], data)
+    
+        if not valid[0]:
+            raise Exception(valid[1])
+    
+        # Check new currencies used
+        if len(valid) > 2:
+            new_curr = valid[2]
+    
+            # Set the currency as used
+            cont = Context.objects.all()[0]
+            currency = None
+            # Search the currency
+            for c in cont.allowed_currencies['allowed']:
+                if c['currency'].lower() == new_curr.lower():
+                    currency = c
+                    break
+    
+            cont.allowed_currencies['allowed'].remove(currency)
+            currency['in_use'] = True
+            cont.allowed_currencies['allowed'].append(currency)
+            cont.save()
+    
+        # Serialize and store USDL info in json-ld format
+        graph = rdflib.Graph()
+        rdf_format = usdl_info['content_type']
+    
+        if rdf_format == 'text/turtle' or rdf_format == 'text/plain':
+                rdf_format = 'n3'
+        elif rdf_format == 'application/json':
+                rdf_format = 'json-ld'
+    
+        graph.parse(data=usdl, format=rdf_format)
+        data['offering_description'] = graph.serialize(format='json-ld', auto_compact=True)
+    
+        logger.debug('create_offering(): actual offering creation')
+        # Create the offering
+        offering = Offering.objects.create(
+            name=data['name'],
+            owner_organization=organization,
+            owner_admin_user=provider,
+            version=data['version'],
+            state='uploaded',
+            description_url=data['description_url'],
+            resources=[],
+            comments=[],
+            tags=[],
+            image_url=data['image_url'],
+            related_images=data['related_images'],
+            offering_description=json.loads(data['offering_description']),
+            notification_url=notification_url,
+            creation_date=datetime.now(),
+            open=is_open
+        )
+    
+        if settings.OILAUTH:
+            offering.applications = data['applications']
+            offering.save()
+    
+        if 'resources' in json_data and len(json_data['resources']) > 0:
+            bind_resources(offering, json_data['resources'], profile.user)
+    
+        # Load offering document to the search index
+        index_path = settings.DATADIR
+        index_path = os.path.join(index_path, 'search')
+        index_path = os.path.join(index_path, 'indexes')
+    
+        search_engine = SearchEngine(index_path)
+        search_engine.create_index(offering)
+        
+    except Exception as e:
+        uibuff = StringIO()
+        traceback.print_exc()
+        logger.error(uibuff.getvalue())
+        raise e
 
 
 def update_offering(offering, data):
+    logger.debug('update_offering(): update offering')
 
     # Check if the offering has been published,
     # if published the offering cannot be updated
@@ -617,9 +645,10 @@ def update_offering(offering, data):
 
     # Update the logo
     if 'image' in data:
-        logo_path = offering.image_url
-        logo_path = os.path.join(settings.DATADIR, logo_path[1:])
-
+        # take just file name from url
+        logo_file_name = os.path.basename(offering.image_url)
+        logo_path = os.path.join(path, logo_file_name) 
+        
         # Remove the old logo
         os.remove(logo_path)
 
@@ -649,8 +678,12 @@ def update_offering(offering, data):
             offering.related_images.append(settings.MEDIA_URL + dir_name + '/' + img['name'])
 
     new_usdl = False
+    
+    logger.debug('update_offering(): images ok, checking offering_description')
+    
     # Update the USDL description
     if 'offering_description' in data:
+        logger.debug('update_offering(): upload USDL')
         usdl_info = data['offering_description']
 
         repository_adaptor = RepositoryAdaptor(offering.description_url)
@@ -661,6 +694,7 @@ def update_offering(offering, data):
 
     # The USDL document has changed in the repository
     elif 'description_url' in data:
+        logger.debug('update_offering(): USDL upload url')
         usdl_info = {}
         usdl_url = data['description_url']
 
@@ -678,6 +712,8 @@ def update_offering(offering, data):
 
         new_usdl = True
     elif 'offering_info' in data:
+        logger.debug('update_offering(): basic USDL')
+        
         usdl_info = {
             'content_type': 'application/rdf+xml'
         }
@@ -918,7 +954,7 @@ def delete_offering(offering):
 
 
 def bind_resources(offering, data, provider):
-
+    logger.debug('bind_resources()')
     # Check that the offering supports binding
     if offering.state != 'uploaded' and not offering.open:
         raise PermissionDenied('This offering cannot be modified')
@@ -928,12 +964,14 @@ def bind_resources(offering, data, provider):
     for of_res in offering.resources:
         offering_resources.append(of_res)
 
+    logger.debug('bind_resources(): iterating resources')
     for res in data:
         try:
+            logger.debug("bind_resources(): getting resource object: %s" % res['name'])
             resource = Resource.objects.get(name=res['name'], version=res['version'], provider=provider.userprofile.current_organization)
         except:
             raise ValueError('Resource not found: ' + res['name'] + ' ' + res['version'])
-
+        
         # Check resource state
         if resource.state == 'deleted':
             raise PermissionDenied('Invalid resource, the resource ' + res['name'] + ' ' + res['version'] + ' is deleted')
@@ -949,7 +987,7 @@ def bind_resources(offering, data, provider):
 
     # added_resources contains the resources to be added to the offering
     # and offering_resources the resources to be deleted from the offering
-
+    logger.debug('bind_resources(): saving resources')
     for add_res in added_resources:
         resource = Resource.objects.get(pk=add_res)
         resource.offerings.append(offering.pk)
@@ -962,4 +1000,5 @@ def bind_resources(offering, data, provider):
         resource.save()
         offering.resources.remove(del_res)
 
+    logger.debug('bind_resources(): saving offering')
     offering.save()
