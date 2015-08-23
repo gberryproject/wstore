@@ -18,6 +18,9 @@
 # along with WStore.
 # If not, see <https://joinup.ec.europa.eu/software/page/eupl/licence-eupl>.
 
+# NOTE: This file is meant for case where WStore is configured to use suburl.
+#       This means application is located for example in /store/ instead of /
+
 from django.conf.urls.defaults import patterns, include, url
 from django.contrib import admin
 

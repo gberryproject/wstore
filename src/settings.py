@@ -18,6 +18,9 @@
 # along with WStore.
 # If not, see <https://joinup.ec.europa.eu/software/page/eupl/licence-eupl>.
 
+# NOTE: Differences to settings_template.py
+#        - Uses suburl /store
+#        - All run time data is placed to <root>/data
 
 from os import path
 
@@ -240,3 +243,39 @@ CLIENTS = {
 PAYMENT_CLIENT = CLIENTS[PAYMENT_METHOD]
 
 RESOURCE_INDEX_DIR = path.join(DATADIR, path.join('admin', 'indexes'))
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': True,
+    'formatters': {
+        'verbose': {
+            'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
+        },
+        'simple': {
+            'format': '%(asctime)s %(name)s %(filename)s:%(lineno)s %(levelname)s - %(message)s'
+        },
+    },
+    'handlers': {
+        'null': {
+            'level':'DEBUG',
+            'class':'django.utils.log.NullHandler',
+        },
+        'console':{
+            'level':'DEBUG',
+            'class':'logging.StreamHandler',
+            'formatter': 'simple'
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers':['null'],
+            'propagate': True,
+            'level':'INFO',
+        },
+        'wstore': {
+            'handlers': ['console'],
+            'propagate': True,
+            'level': 'DEBUG',
+        }
+    }
+}
