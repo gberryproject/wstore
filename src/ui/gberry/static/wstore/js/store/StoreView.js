@@ -134,29 +134,29 @@
         if ($('.detailed-info').length) {
             $('#home-container').empty()
         }
-        searchView.setTitle('Services');
-        searchView.initSearchView('SEARCH_TAG_ENTRY', 'service');
+        searchView.setTitle('All Games');
+        searchView.initSearchView('SEARCH_TAG_ENTRY', 'game');
     };
 
     setDataHandler = function setDataHandler() {
         if ($('.detailed-info').length) {
             $('#home-container').empty()
         }
-        searchView.setTitle('Data');
-        searchView.initSearchView('SEARCH_TAG_ENTRY', 'dataset');
+        searchView.setTitle('Family Games');
+        searchView.initSearchView('SEARCH_TAG_ENTRY', 'family');
     };
 
     setWidgetHandler = function setWidgetHandler() {
         if ($('.detailed-info').length) {
             $('#home-container').empty()
         }
-        searchView.setTitle('Widgets / Mashups');
-        searchView.initSearchView('SEARCH_TAG_ENTRY', 'widget');
+        searchView.setTitle('Children Games');
+        searchView.initSearchView('SEARCH_TAG_ENTRY', 'children');
     };
 
     var setContext = function setContext() {
      // Change browser URL
-        history.pushState({}, 'FI-WARE Store', '/');
+        history.pushState({}, 'GBerry Webstore', '/');
         pageLoader.setCurrentPage('home');
     };
 

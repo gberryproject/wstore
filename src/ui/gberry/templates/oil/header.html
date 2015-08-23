@@ -10,13 +10,10 @@
 
           <a href="/store" class="brand">
             {% if not portal %}
-            <div class="store_title">
-                GBerry
-                <h2>Store</h2>
-            </div>
-            <div id="title-shadow"></div>
+            <img alt="GBerry" class="logo portal-brand" src="{{ STATIC_URL }}oil/img/gberry_www_logo_with_bigger_text.png">
+            <span class="store_title"><h2>Webstore</h2></span>
             {% else %}
-            <img alt="FI-WARE" class="logo portal-brand" src="{{ STATIC_URL }}oil/img/Fi-lab.png">
+            <img alt="GBerry" class="logo portal-brand" src="{{ STATIC_URL }}oil/img/gberry_www_logo_with_bigger_text.png">
             {% endif %}
           </a>
         </div>

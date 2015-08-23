@@ -37,7 +37,7 @@ nav.navbar-inner .logo-header{
 }
 
 .logo-header img{
-  width: 60px;
+  /*width: 60px;*/
   padding-top: 0;
   float: left;
   margin-top: -6px;
@@ -45,9 +45,9 @@ nav.navbar-inner .logo-header{
 }
 
 .portal-brand {
-  width: 169px !important;
+  /*width: 169px !important;*/
   margin-left: -11px;
-  margin-top: -13px !important;
+  margin-top: -15px !important;
 }
 
 .logo-header .brand{

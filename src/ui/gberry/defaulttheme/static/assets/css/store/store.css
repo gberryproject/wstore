@@ -149,7 +149,8 @@
   }
 }
 
-.store-menu .icon-gears {
+/* first icon */
+.store-menu .icon-gamepad {
   font-size: 20px;
   position: relative;
   top: 9px;
@@ -157,7 +158,8 @@
   color: rgb(255,255,255);
 }
 
-.store-menu .icon-hdd {
+/* second icon */
+.store-menu .icon-group {
   font-size: 22px;
   position: relative;
   top: -29px;
@@ -165,6 +167,7 @@
   color: rgb(0, 45, 103);
 }
 
+/* third icon */
 .store-menu .icon-puzzle-piece {
   font-size: 20px;
   position: relative;

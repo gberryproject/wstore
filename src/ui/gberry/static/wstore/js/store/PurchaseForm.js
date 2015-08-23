@@ -247,7 +247,8 @@
     var downloadResources = function downloadResources(data) {
         var resources = data.resources;
         for (var i = 0; i < resources.length; i++) {
-            window.open(resources[i]);
+        	// TODO: quick hack to prevent resource downloading - there should be option ...
+            //window.open(resources[i]);
         }
         window.open(data.bill[0]);
     };

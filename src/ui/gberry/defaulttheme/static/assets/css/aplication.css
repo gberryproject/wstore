@@ -19,6 +19,8 @@
 		 
 
 } */
+
+/* TODO: does affect? Needs to be changed */
 #menu-index-img {
 	padding: auto;
 	background-image:url(../img/boceto2-04.png);
@@ -178,7 +180,7 @@
 
 .inline{ display:inline}
 .inline-block{ display:inline-block}
-.logo{margin-bottom:55px;}
+.logo{margin-bottom:55px;height: 36px}
 
 .big-tittle{ 
   background: -moz-linear-gradient(left,  rgba(255,255,255,0) 0%, rgba(237,237,237,0.85) 50%, rgba(237,237,237,1) 100%);

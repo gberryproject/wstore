@@ -154,13 +154,15 @@ h2 {
 }
 
 .store_title span {
-    color: rgb(0, 45, 103);
+    /*color: rgb(0, 45, 103);*/
 }
 
 .store_title h2 {
     float: right;
     font-family: NeoTech;
-    margin-top: 5px;
+    margin-top: 1px;
+    padding-left: 15px;
+    color: #3E80AD;
 }
 
 .return-button {
@@ -297,8 +299,10 @@ h2 {
   width: 170px;
   height: 80px;
   position: absolute;
-  bottom: 0;
+  /*bottom: 0;*/
   left: 0;
+  padding-bottom: 5px;
+  padding-top: 5px;
 }
 
 .img-filler {

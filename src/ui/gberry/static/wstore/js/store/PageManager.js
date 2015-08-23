@@ -69,12 +69,12 @@
         var tag = INIT_INFO;
         var title = tag;
 
-        if (tag == 'service') {
-            title = 'Services';
-        } else if (tag == 'dataset') {
-            title = 'Datasets';
-        } else if (tag == 'widget') {
-            title = 'Widgets / Mashups';
+        if (tag == 'game') {
+            title = 'All Games';
+        } else if (tag == 'family') {
+            title = 'Family Games';
+        } else if (tag == 'children') {
+            title = 'Children Games';
         }
         
         loadSearchPage(title, 'SEARCH_TAG_ENTRY', tag);
