@@ -1,0 +1,70 @@
+#!/bin/sh
+### BEGIN INIT INFO
+# Provides:          <NAME>
+# Required-Start:    $local_fs $network $named $time $syslog
+# Required-Stop:     $local_fs $network $named $time $syslog
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Description:       <DESCRIPTION>
+### END INIT INFO
+
+# unique name
+NAME=fiware-wstore
+SCRIPT=/home/tevuore/virtenvs/wstore/bin/python
+CWD=/git/wstore/src
+PARAMS="$CWD/manage.py runserver 8000 --noreload"
+RUNASUSER=tevuore
+RUNASGROUP=tevuore
+
+PIDDIR=/var/run/gberry
+PIDFILE=$PIDDIR/$NAME.pid
+
+LOGDIR=/var/log/gberry
+LOGFILE=$LOGDIR/$NAME.log
+
+
+start() {
+  if [ -f $PIDFILE ] && kill -0 $(cat "$PIDFILE"); then
+    echo 'Service already running' >&2
+    return 1
+  fi
+  if [ ! -e $PIDDIR ]; then
+    mkdir $PIDDIR
+    chown $RUNASUSER:$RUNASGROUP $PIDDIR
+  fi
+
+  if [ ! -e $LOGDIR ]; then
+    mkdir $LOGDIR
+    chown $RUNASUSER:$RUNASGROUP $LOGDIR
+  fi
+  
+  echo 'Starting serviceâ€¦' >&2
+
+  start-stop-daemon --start --quiet --chuid=$RUNASUSER:$RUNASGROUP --chdir=$CWD --background --make-pidfile --pidfile $PIDFILE --startas /bin/bash -- -c "exec $SCRIPT $PARAMS > $LOGFILE 2>&1"
+  
+  echo 'Service started' >&2
+}
+
+stop() {
+  echo 'Stopping serviceâ€¦' >&2
+  start-stop-daemon --stop --quiet --pidfile $PIDFILE --oknodo --retry 5
+  RETVAL="$?"
+  rm -f $PIDFILE
+  # echo 'Service stopped' >&2
+  return "$RETVAL"
+}
+
+case "$1" in
+  start)
+    start
+    ;;
+  stop)
+    stop
+    ;;
+  retart)
+    stop
+    start
+    ;;
+  *)
+    echo "Usage: $0 {start|stop|restart}"
+esac
