@@ -22,12 +22,18 @@ from __future__ import unicode_literals
 
 import urllib2
 import unicodedata
+import logging
+
 from urllib2 import HTTPError
 from urlparse import urljoin
 
 from wstore.store_commons.utils.method_request import MethodRequest
 from wstore.store_commons.utils import mimeparser
 
+logger = logging.getLogger('wstore.respositoryAdapter')
+
+class RepositoryError(Exception):
+    pass
 
 class RepositoryAdaptor():
 
@@ -47,7 +53,7 @@ class RepositoryAdaptor():
                 self._collection += '/'
 
     def upload(self, content_type, data, name=None):
-
+        logger.debug("Uploading to repository")
         opener = urllib2.build_opener()
         url = self._repository_url
 
@@ -62,10 +68,15 @@ class RepositoryAdaptor():
         headers = {'content-type': content_type + '; charset=utf-8'}
         request = MethodRequest('PUT', url, data, headers)
 
-        response = opener.open(request)
-
-        if not (response.code > 199 and response.code < 300):
-            raise HTTPError(response.url, response.code, response.msg, None, None)
+        try:
+            response = opener.open(request)
+    
+            if not (response.code > 199 and response.code < 300):
+                logger.error("Uploading to repository failed: code=%s, url=%s, msg=%s" % (response.url, response.code, response.msg))
+                raise HTTPError(response.url, response.code, response.msg, None, None)
+        except Exception as e:
+            logger.error("Uploading to repository failed: exception=%s" % e)
+            raise RepositoryError("Failed to upload to repository: %s" % e)
 
         return url
 
