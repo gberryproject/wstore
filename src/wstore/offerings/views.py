@@ -21,6 +21,7 @@
 from __future__ import unicode_literals
 
 import json
+import logging
 import urllib2
 from urllib2 import HTTPError
 
@@ -40,6 +41,7 @@ update_resource, upgrade_resource
 from wstore.store_commons.utils.method_request import MethodRequest
 from wstore.social.reviews.review_manager import ReviewManager
 
+logger = logging.getLogger('wstore.offerings.views')
 
 ####################################################################################################
 #########################################    Offerings   ###########################################
@@ -67,7 +69,7 @@ class OfferingCollection(Resource):
     @authentication_required
     @supported_request_mime_types(('application/json', 'application/xml'))
     def create(self, request):
-
+        logger.debug("OfferingCollection.create()")
         # Obtains the user profile of the user
         user = request.user
 
@@ -75,6 +77,7 @@ class OfferingCollection(Resource):
         roles = user.userprofile.get_current_roles()
 
         # Checks the provider role
+        # TODO: little bit dubious to just iterate over roles
         if 'provider' in roles:
             try:
                 json_data = json.loads(unicode(request.raw_post_data, 'utf-8'))
@@ -90,6 +93,7 @@ class OfferingCollection(Resource):
 
     @authentication_required
     def read(self, request):
+        logger.debug("OfferingCollection.read()")
         try:
             # Read the query string in order to know the filter and the page
             filter_ = request.GET.get('filter', 'published')
@@ -148,6 +152,7 @@ class OfferingEntry(Resource):
 
     @authentication_required
     def read(self, request, organization, name, version):
+        logger.debug("OfferingEntry.read()")
         user = request.user
         try:
             offering, org = _get_offering(organization, name, version)
@@ -166,7 +171,7 @@ class OfferingEntry(Resource):
     @authentication_required
     @supported_request_mime_types(('application/json', 'application/xml'))
     def update(self, request, organization, name, version):
-
+        logger.debug("OfferingEntry.update()")
         user = request.user
         # Get the offering
         try:
@@ -185,9 +190,13 @@ class OfferingEntry(Resource):
                 return build_response(request, 403, 'You are not allowed to edit the current offering')
 
             data = json.loads(request.raw_post_data)
-
             update_offering(offering, data)
         except Exception, e:
+            import traceback
+            import StringIO
+            buff = StringIO.StringIO()
+            traceback.print_exc(file=buff)
+            print("EXCEPTION: %s %s" % (str(e), buff.getvalue()))
             return build_response(request, 400, e.message)
 
         return build_response(request, 200, 'OK')
@@ -221,7 +230,7 @@ class OfferingEntry(Resource):
 
 
 class PublishEntry(Resource):
-
+    
     # Publish the offering is some marketplaces
     @authentication_required
     @supported_request_mime_types(('application/json', 'application/xml'))
@@ -269,7 +278,7 @@ class NewestCollection(Resource):
 
     @authentication_required
     def read(self, request):
-
+        logger.debug("NewestCollection.read()")
         site = get_current_site(request)
         context = Context.objects.get(site=site)
 
@@ -475,7 +484,8 @@ class BindEntry(Resource):
         # Bind the resources
         try:
             data = json.loads(request.raw_post_data)
-            bind_resources(offering, data, request.user)
+            bind_resources(offering, data['resources'], request.user)
+            
         except Exception as e:
             return build_response(request, 400, unicode(e))
 
