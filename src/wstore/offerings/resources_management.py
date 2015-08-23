@@ -23,6 +23,7 @@ from __future__ import unicode_literals
 import base64
 import os
 import re
+import logging
 from bson import ObjectId
 
 from django.conf import settings
@@ -34,6 +35,7 @@ from wstore.store_commons.utils.url import is_valid_url
 from wstore.store_commons.utils.version import is_lower_version
 from django.core.exceptions import PermissionDenied
 
+logger = logging.getLogger('wstore.offerings.resources_management')
 
 def _save_resource_file(provider, name, version, file_):
     # Load file contents
@@ -241,7 +243,7 @@ def delete_resource(resource):
 
 
 def update_resource(resource, data):
-
+    logger.debug('update_resource()')
     # Check that the resource can be updated
     if resource.state == 'deleted':
         raise PermissionDenied('Deleted resources cannot be updated')
